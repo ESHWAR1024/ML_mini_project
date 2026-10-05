@@ -1,0 +1,33 @@
+# ---- Data (never commit; it is large and re-downloadable) ----
+data/
+*.zip
+*.csv
+
+# ---- Trained model files (can exceed GitHub's 100 MB file limit) ----
+*.joblib
+*.pkl
+
+# ---- Python environment and caches ----
+.venv/
+venv/
+env/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.pytest_cache/
+
+# ---- Secrets / local config ----
+.env
+.env.*
+*.json.key
+gcloud-*.json
+
+# ---- OS / editor files ----
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# ---- Keep small result files in Git (tables and plots) ----
+# outputs/results_table.md, outputs/metrics.json and outputs/*.png are NOT ignored on purpose,
+# so evaluators can see your results without re-running everything.
