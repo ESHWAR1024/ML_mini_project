@@ -238,7 +238,7 @@ def main(a):
 
     # Save outputs ------------------------------------------------------------
     summary = dict(n_train=len(tr), n_val=len(va), n_test=len(te), best_model=best, features=feats,
-                   use_lag=not a.no_lag,
+                   use_lag=not a.no_lag, n_nets=a.seeds, scaler="StandardScaler",
                    svr_params=({k: float(v) if not isinstance(v, str) else v
                                 for k, v in search.best_params_.items()} if search else None),
                    nn_params={k: (list(v) if isinstance(v, tuple) else v) for k, v in cfg.items()},
