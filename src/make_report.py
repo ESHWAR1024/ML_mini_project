@@ -10,8 +10,10 @@ metrics.json / the CSV, so re-run this whenever you re-train.
 The PAPER and "first version" numbers below are fixed constants (from the reference report and from our v1 run).
 """
 import argparse
+import glob
 import json
 import os
+import sys
 
 import pandas as pd
 from reportlab.lib import colors
@@ -56,8 +58,36 @@ def facts(a, m):
     return f
 
 
+def find_metrics(given):
+    """Return a metrics.json path to use, searching common locations if the given one is missing."""
+    if given and os.path.exists(given):
+        return given
+    candidates = ["outputs_final/metrics.json", "outputs/metrics.json", "outputs_nn/metrics.json",
+                 "outputs_fast/metrics.json", "outputs_test/metrics.json"]
+    candidates += sorted(glob.glob("outputs*/metrics.json"))
+    found = [c for c in dict.fromkeys(candidates) if os.path.exists(c)]
+    if found:
+        print(f"NOTE: '{given}' not found, using '{found[0]}' instead.\n"
+             f"      (pass --metrics PATH --outdir DIR to pick a different run)")
+        return found[0]
+    here = os.getcwd()
+    sys.exit(
+        f"ERROR: could not find a metrics.json anywhere under '{here}'.\n"
+        f"       You gave --metrics '{given}'.\n"
+        f"       This file is written by train.py when it finishes, e.g.:\n"
+        f"           python src/train.py --data data/ozone_daily.csv --outdir outputs_final\n"
+        f"       Things to check:\n"
+        f"       1. Are you running this from the project root (the folder with 'src/' and 'data/')?\n"
+        f"          Current folder: {here}\n"
+        f"       2. Did the train.py run finish and print 'DONE' / 'Saved ... to outputs_final/'?\n"
+        f"       3. Did you train into a different --outdir? Pass it here with --metrics and --outdir.")
+
+
 def build(a):
-    m = json.load(open(a.metrics))
+    metrics_path = find_metrics(a.metrics)
+    if a.outdir == ap_defaults["outdir"] and os.path.dirname(metrics_path):
+        a.outdir = os.path.dirname(metrics_path)   # follow metrics.json if we auto-switched run folders
+    m = json.load(open(metrics_path))
     R = m["results"]
     fx = facts(a, m)
     names = list(R)
@@ -236,8 +266,9 @@ def build(a):
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
-    ap.add_argument("--metrics", default="outputs_final/metrics.json")
-    ap.add_argument("--outdir", default="outputs_final")
+    ap_defaults = dict(metrics="outputs_final/metrics.json", outdir="outputs_final")
+    ap.add_argument("--metrics", default=ap_defaults["metrics"])
+    ap.add_argument("--outdir", default=ap_defaults["outdir"])
     ap.add_argument("--data", default="data/ozone_daily.csv")
     ap.add_argument("--val-year", type=int, default=2018)
     ap.add_argument("--test-year", type=int, default=2019)
