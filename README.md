@@ -200,5 +200,4 @@ results.
 - US EPA, AirData daily summary files, https://aqs.epa.gov/aqsweb/airdata
 - Pedregosa et al., *Scikit-learn: Machine Learning in Python*, JMLR 12, 2011.
 
-## Team
-Name 1 (SRN) | Name 2 (SRN) | Problem no. __
+
